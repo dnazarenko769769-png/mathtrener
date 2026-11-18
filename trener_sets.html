@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Тренажер: Sets & Numbers</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.0/dist/tailwind.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,optical%20size,400;0,optical%20size,600;1,optical%20size,400;1,optical%20size,600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0b0f1a;--card:#161d2e;--border:#2a3548;--fg:#e8eaed;--muted:#6b7a8c;--accent:#00d4aa;--danger:#ff6b6b;--warn:#f0a500;--success:#2a9d8f}
+  *{box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);margin:0;padding:0}.container{max-width:960px;margin:0 auto;padding:1rem}.header{text-align:center;padding:2rem 0}.logo{font-size:2rem;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:.5rem}.subtitle{color:var(--muted);font-size:.9rem}.score-panel{background:var(--card);border:1px solid var(--border);padding:1rem 1.5rem;margin:1rem 0;border-radius:8px}.score{font-size:1.2rem}.score-correct,.score-wrong{display:inline-block;min-width:1.2rem;height:1.2rem;border-radius:50%;font-size:.7rem;text-align:center;line-height:1.2;margin:0 .3rem}.score-correct{background:var(--success);color:#fff}.score-wrong{background:var(--danger);color:#fff}.flashcard{background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;position:relative;transition:transform .2s;min-height:220px}.flashcard.flip{transform:rotateY(180deg)}.card-face{position:relative;display:flex;flex-direction:column;height:100%}.q{flex:1;overflow:auto;color:var(--muted);font-size:.95rem}.a{flex:1;overflow:auto;color:var(--fg);font-size:.95rem}.hint{color:var(--accent);font-style:italic;margin-top:.5rem;font-size:.8rem;cursor:pointer}.nav{display:flex;gap:.5rem;margin-top:1rem;justify-content:center}.btn{background:var(--accent);color:#000;padding:.6rem 1.2rem;border:none;border-radius:6px;font-weight:600;cursor:pointer;transition:opacity .2s}.btn:hover{opacity:.9}.btn-secondary{background:var(--card);border:1px solid var(--border);color:var(--fg)}.progress{height:8px;background:var(--border);border-radius:4px;overflow:visible}.progress-bar{height:100%;background:var(--accent);width:0%;transition:width .3s}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:100}.modal-content{background:var(--card);padding:2rem;border-radius:12px;max-width:400px;width:90%;text-align:center}.close{position:absolute;top:1rem;right:1.5rem;color:var(--muted);font-size:1.5rem;cursor:pointer}.interactive{background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;margin-top:1.5rem}.interactive input{background:#111;border:1px solid var(--border);color:var(--fg);padding:.5rem;border-radius:6px;width:160px;margin-right:.5rem}.feedback{margin-top:.7rem;font-weight:600}.feedback.correct{color:var(--success)}.feedback.wrong{color:var(--danger)}.hidden{display:none}.example{background:#0f1626;border:1px solid var(--border);padding:.8rem;border-radius:8px;margin-top:.5rem;font-size:.85rem;color:var(--muted)}.example b{color:var(--accent)}.warn{color:var(--warn);font-size:.8rem;font-weight:600}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">MATH TRENER</div>
+    <div class="subtitle">Sets & Numbers — Набор 1 из 9 (простой язык)</div>
+  </div>
+
+  <div class="score-panel">
+    <span class="score">Баллы: <span id="score">0</span>/<span id="total">35</span></span>
+    <div>
+      <span class="score-correct" id="s-correct">0</span>
+      <span class="score-wrong" id="s-wrong">0</span>
+    </div>
+  </div>
+
+  <div id="deck" class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+
+  <div class="interactive">
+    <h3 class="text-lg font-bold mb-3">Интерактивные задачи (пиши ответ в поле)</h3>
+    <div id="taskArea"></div>
+    <input type="text" id="taskInput" placeholder="Ваш ответ">
+    <button class="btn" id="checkBtn">Проверить</button>
+    <div id="taskFeedback" class="feedback"></div>
+    <button class="btn btn-secondary mt-2" id="nextTaskBtn">Следующая задача</button>
+  </div>
+
+  <div class="nav mt-6 justify-center">
+    <button class="btn btn-secondary" id="menuBtn">На главную</button>
+    <button class="btn" id="prevBtn" disabled>← Назад</button>
+    <button class="btn" id="nextBtn">Вперед →</button>
+    <button class="btn" id="modeBtn">Перейти к задачам</button>
+  </div>
+
+  <progress class="progress" max="35" value="0"><span id="progressBar" style="width:0%"></span></progress>
+
+  <div id="menu" class="fixed inset-0 bg-black/70 opacity-0 invisible transition-all duration-300 flex items-center justify-center z-50">
+    <div class="bg-white/10 p-6 rounded-xl text-center max-w-md">
+      <h2 class="text-2xl font-bold mb-4">Режим работы</h2>
+      <button class="btn btn-secondary w-full mb-2" data-mode="cards">Карточки (изучение теории)</button>
+      <button class="btn btn-secondary w-full mb-2" data-mode="task">Задачи с вводом ответа</button>
+      <button class="btn btn-secondary w-full mt-2" data-mode="exit">На главную меню тем</button>
+    </div>
+  </div>
+
+  <div id="modal" class="modal"><div class="modal-content"><span class="close">&times;</span><p id="modalText"></p><button class="btn mt-4" id="modalOk">Хорошо</button></div></div>
+
+  <script>
+    const cards = [
+      {q:"Что такое множество? (простым языком)",a:"Это просто собрали разные предметы в одну корзинку. Главное — можно чётко сказать: этот предмет в корзинке или нет. Обозначают корзинку заглавной буквой (A, B), а предметы внутри — маленькой (a, b)."},
+      {q:"Знак ∈ (принадлежит)",a:"a ∈ A читается «a принадлежит множеству A» — предмет a лежит в корзинке A."},
+      {q:"Знак ∉ (не принадлежит)",a:"a ∉ A читается «a НЕ принадлежит множеству A» — предмета a нет в корзинке."},
+      {q:"Пустое множество ∅",a":"Корзинка пустая. Ни одного предмета внутри. Пишут ∅ или { }."},
+      {q:"Способы задать множество",a":"1) Перечислить всё: A = {0, π, 2, Venezia, N} — просто список. 2) По свойству: E = {x | x — чётное натуральное число} — описываем правило, кто попадает внутрь. 3) Диаграмма Венна — рисуем корзинки как круги."},
+      {q:"Порядок не важен",a":"{a, b} = {b, a}. В корзинке нет «первого» и «второго» предмета."},
+      {q:"Повторы не считаются",a":"{a, a} = {a}. Если положить одно и то же дважды, это всё равно один предмет."},
+      {q:"Подмножество A ⊆ B",a":"Всё, что лежит в корзинке A, тоже лежит в корзинке B. A — часть B."},
+      {q:"Собственное подмножество A ⊂ B",a":"A часть B, но A ≠ B (в B есть что-то ещё, чего нет в A)."},
+      {q:"A ⊆ A всегда верно",a":"Любая корзинка — часть сама себя. И ∅ ⊆ A для любой A (пустая корзинка — часть любой корзинки)."},
+      {q:"Кардинальность |A|",a":"Сколько предметов в корзинке. Если их n, то всех подмножеств будет 2^n (степень множества P(A)). Пример: |A| = 3 → |P(A)| = 2^3 = 8."},
+      {q:"|∅| и |{∅}|",a":"|∅| = 0 (пустая корзинка, ничего нет). |{∅}| = 1 (в корзинке лежит сама пустая корзинка — один предмет)."},
+      {q:"Объединение A ∪ B",a":"Всё, что лежит в A или в B (или в обеих сразу). Объединяем корзинки."},
+      {q:"Пересечение A ∩ B",a":"Только то, что лежит и в A, и в B одновременно. Общая часть корзинок."},
+      {q:"Непересекающиеся (разрывные) множества",a":"A ∩ B = ∅. У корзинок нет ничего общего."},
+      {q:"Разность A \\ B",a":"Всё, что в A, но НЕ в B. Из корзинки A вытащили всё, что тоже есть в B."},
+      {q:"Комплимент A^c",a":"Всё из большой универсальной корзинки U, чего нет в A."},
+      {q:"Законы Де Моргана",a":"(A ∪ B)^c = A^c ∩ B^c и (A ∩ B)^c = A^c ∪ B^c. Также (A^c)^c = A."},
+      {q:"Свойства операций",a":"Ассоциативность: (A∪B)∪C = A∪(B∪C) — скобки не важны. Коммутативность: A∪B = B∪A. Дистрибутивность: A∪(B∩C) = (A∪B)∩(A∪C)."},
+      {q:"Картцезианский продукт A × B",a":"Все возможные пары (a, b), где a из A, b из B. R² = R × R — это вся декартова плоскость (все точки с координатами x, y)."},
+      {q:"N — натуральные числа",a":"N = {0, 1, 2, 3, ...}. В этом курсе 0 считается натуральным."},
+      {q:"Z — целые числа",a":"Z = {..., -2, -1, 0, 1, 2, ...}. Только у 0 нет знака (0 = ±0)."},
+      {q:"Q — рациональные числа",a":"Q = {m/n : m∈Z, n∈N, n≠0}. Это дроби. Их десятичная запись либо заканчивается (0.48), либо периодическая (0.333...)."},
+      {q:"I — иррациональные числа",a":"Бесконечные НЕпериодические десятичные дроби. Примеры: π, e, √2."},
+      {q:"R — вещественные числа",a":"R = Q ∪ I. Все числа, которые мы используем в курсе. Комплексные числа не в программе."},
+      {q:"Включения N ⊂ Z ⊂ Q ⊂ R",a":"Натуральные — часть целых, целые — часть рациональных, рациональные — часть вещественных."},
+      {q:"Десятичную дробь в обыкновенную",a":"Конечная: 3.4537 = 34537/10000. Периодическая: 3,5̄72 = (3572 − 35)/990."},
+      {q:"Плотность рациональных чисел",a":"Между любыми двумя рациональными числами есть бесконечно много и рациональных, и иррациональных чисел."},
+      {q:"π и e — иррациональны",a":"π ≈ 3.14159..., e ≈ 2.71828... Их десятичная запись бесконечна и не повторяется."},
+      {q:"Рациональный + иррациональный",a":"Сумма — всегда иррациональна. Произведение ненулевого рационального на иррациональное — иррационально."},
+      {q:"Произведение двух иррациональных",a":"Может быть рациональным: √2 · √8 = 4. А может быть иррациональным."},
+      {q:"Интервал [a, b]",a":"{x : a ≤ x ≤ b}. Ограниченный, закрытый — границы входят (точки закрашены)."},
+      {q:"Интервал (a, b)",a":"{x : a < x < b}. Ограниченный, открытый — границы не входят (точки не закрашены)."},
+      {q:"Интервал [a, b)",a":"{x : a ≤ x < b}. Закрыт слева, открыт справа."},
+      {q:"Интервал (a, b]",a":"{x : a < x ≤ b}. Открыт слева, закрыт справа."},
+      {q:"Неограниченные интервалы",a":"[a, +∞), (a, +∞), (-∞, a], (-∞, a), (-∞, +∞) = вся прямая R."},
+      {q:"A = (A ∩ B) ∪ (A \\ B)",a":"Разбиваем корзинку A на две непересекающиеся части: то, что общее с B, и то, что в A но не в B."},
+      {q:"Сумма 5 последовательных положительных целых",a":"Всегда делится на 5. Пример: 1+2+3+4+5 = 15, 15/5 = 3."},
+      {q:"Простые множители 624",a":"624 = 2⁴ · 3 · 13."},
+    ];
+    let current = 0, mode = 'cards', score = 0, total = cards.length;
+    function renderCard(i, flip=false){
+      const c=cards[i];const deck=document.getElementById('deck');deck.innerHTML='';
+      const card=document.createElement('div');card.className=`flashcard ${flip?'flip':''}`;
+      card.innerHTML=`<div class="card-face front"><div class="q">${c.q}</div><div class="hint" onclick="flipCard(${i})">Показать ответ</div></div><div class="card-face back"><div class="a">${c.a}</div><button class="btn btn-secondary mt-2" onclick="flipCard(${i})">Скрыть ответ</button></div>`;
+      deck.appendChild(card);
+    }
+    function flipCard(i){document.querySelectorAll('.flashcard').forEach((el,idx)=>{if(idx===i)el.classList.toggle('flip');});}
+    function nextCard(){current=(current+1)%total;renderCard(current,false);updateNav();updateProgress();}
+    function prevCard(){current=(current-1+total)%total;renderCard(current,false);updateNav();updateProgress();}
+    function updateNav(){document.getElementById('prevBtn').disabled=current===0;document.getElementById('nextBtn').disabled=current===total-1;}
+    function updateProgress(){document.getElementById('progressBar').style.width=$((current+1)/total*100)+'%';document.getElementById('total').textContent=total;document.getElementById('score').textContent=score;}
+
+    const tasks=[
+      {q:"A={1,2,3}, B={2,3,4}. A ∩ B =",a:"{2,3}"},
+      {q:"A={1,2}, B={x,y}. A × B =",a:"{(1,x),(1,y),(2,x),(2,y)}"},
+      {q:"|A|=3, |P(A)| =",a:"8"},
+      {q:"A ∪ B = A ∩ B значит:",a:"A = B"},
+      {q:"|{-2,-1,0,1,2}| =",a:"5"},
+      {q:"0 ∈ N? (да/нет)",a:"да"},
+      {q:"√2 ∈ Q? (да/нет)",a:"нет"},
+      {q:"[0,1] ∪ [1,2] =",a:"[0,2]"},
+      {q:"A \\ B если A ⊆ B:",a:"∅"},
+      {q:"(Aᶜ)ᶜ =",a:"A"},
+      {q:"N ⊂ Z ⊂ Q ⊂ R верно?",a:"да"},
+      {q:"|∅| =",a:"0"},
+      {q:"|{a,b,c}| =",a:"3"},
+      {q:"|P({a,b,c})| =",a:"8"},
+      {q:"(1,30] — левый конец?",a:"открыт"},
+    ];
+    let taskIdx=0,taskScore=0;
+    function showTask(){
+      const area=document.getElementById('taskArea');const inp=document.getElementById('taskInput');const fb=document.getElementById('taskFeedback');
+      const t=tasks[taskIdx];area.innerHTML=`<div class="text-lg font-bold mb-2">${t.q}</div>`;
+      inp.value='';fb.className='feedback';fb.textContent='';document.getElementById('nextTaskBtn').classList.add('hidden');inp.focus();
+    }
+    function checkTask(){
+      const inp=document.getElementById('taskInput').value.trim().toLowerCase();const ans=tasks[taskIdx].a.toLowerCase();
+      const fb=document.getElementById('taskFeedback');const ok=inp===ans||inp.replace(/\s/g,'')===ans.replace(/\s/g,'');
+      fb.className='feedback '+(ok?'correct':'wrong');fb.textContent=ok?'Правильно! ✔':'Неверно. Ответ: '+tasks[taskIdx].a;
+      if(ok){taskScore++;document.getElementById('s-correct').textContent=taskScore;}
+      else{document.getElementById('s-wrong').textContent=(taskIdx+1-taskScore);}
+      document.getElementById('nextTaskBtn').classList.remove('hidden');
+    }
+    function nextTask(){taskIdx=(taskIdx+1)%tasks.length;showTask();}
+
+    document.getElementById('checkBtn').onclick=checkTask;
+    document.getElementById('nextTaskBtn').onclick=nextTask;
+    document.getElementById('taskInput').addEventListener('keypress',e=>{if(e.key==='Enter')checkTask();});
+
+    function showModal(text){document.getElementById('modalText').textContent=text;document.getElementById('modal').style.display='flex';}
+    document.querySelector('.close').onclick=()=>{document.getElementById('modal').style.display='none';};
+    document.getElementById('modalOk').onclick=()=>{document.getElementById('modal').style.display='none';};
+    document.getElementById('menuBtn').onclick=()=>{document.getElementById('menu').style.display='flex';document.body.style.overflow='hidden';};
+    document.getElementById('modeBtn').onclick=()=>{
+      const deck=document.getElementById('deck');const inter=document.querySelector('.interactive');const nav=document.querySelector('.nav');const prog=document.querySelector('.progress');
+      if(mode==='cards'){deck.classList.add('hidden');inter.classList.remove('hidden');nav.classList.add('hidden');prog.classList.add('hidden');showTask();mode='task';}
+      else{deck.classList.remove('hidden');inter.classList.add('hidden');nav.classList.remove('hidden');prog.classList.remove('hidden');renderCard(0,false);updateNav();updateProgress();mode='cards';}
+    };
+    document.querySelectorAll('#menu button').forEach(btn=>{
+      btn.onclick=()=>{
+        const m=btn.dataset.mode;document.getElementById('menu').style.display='none';document.body.style.overflow='';
+        if(m==='exit'){window.location='index.html';return;}
+        const deck=document.getElementById('deck');const inter=document.querySelector('.interactive');const nav=document.querySelector('.nav');const prog=document.querySelector('.progress');
+        if(m==='task'){deck.classList.add('hidden');inter.classList.remove('hidden');nav.classList.add('hidden');prog.classList.add('hidden');showTask();mode='task';}
+        else{deck.classList.remove('hidden');inter.classList.add('hidden');nav.classList.remove('hidden');prog.classList.remove('hidden');renderCard(0,false);updateNav();updateProgress();mode='cards';}
+      };
+    });
+    renderCard(0,false);updateNav();updateProgress();
+  </script>
+</body>
+</html>

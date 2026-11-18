@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Тренажер: Trigonometry</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.0/dist/tailwind.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,optical%20size,400;0,optical%20size,600;1,optical%20size,400;1,optical%20size,600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0b0f1a;--card:#161d2e;--border:#2a3548;--fg:#e8eaed;--muted:#6b7a8c;--accent:#00d4aa;--danger:#ff6b6b;--warn:#f0a500;--success:#2a9d8f}
+  *{box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);margin:0;padding:0}.container{max-width:960px;margin:0 auto;padding:1rem}.header{text-align:center;padding:2rem 0}.logo{font-size:2rem;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:.5rem}.subtitle{color:var(--muted);font-size:.9rem}.score-panel{background:var(--card);border:1px solid var(--border);padding:1rem 1.5rem;margin:1rem 0;border-radius:8px}.score{font-size:1.2rem}.score-correct,.score-wrong{display:inline-block;min-width:1.2rem;height:1.2rem;border-radius:50%;font-size:.7rem;text-align:center;line-height:1.2;margin:0 .3rem}.score-correct{background:var(--success);color:#fff}.score-wrong{background:var(--danger);color:#fff}.flashcard{background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;position:relative;transition:transform .2s;min-height:220px}.flashcard.flip{transform:rotateY(180deg)}.card-face{position:relative;display:flex;flex-direction:column;height:100%}.q{flex:1;overflow:auto;color:var(--muted);font-size:.95rem}.a{flex:1;overflow:auto;color:var(--fg);font-size:.95rem}.hint{color:var(--accent);font-style:italic;margin-top:.5rem;font-size:.8rem;cursor:pointer}.nav{display:flex;gap:.5rem;margin-top:1rem;justify-content:center}.btn{background:var(--accent);color:#000;padding:.6rem 1.2rem;border:none;border-radius:6px;font-weight:600;cursor:pointer;transition:opacity .2s}.btn:hover{opacity:.9}.btn-secondary{background:var(--card);border:1px solid var(--border);color:var(--fg)}.progress{height:8px;background:var(--border);border-radius:4px;overflow:visible}.progress-bar{height:100%;background:var(--accent);width:0%;transition:width .3s}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:100}.modal-content{background:var(--card);padding:2rem;border-radius:12px;max-width:400px;width:90%;text-align:center}.close{position:absolute;top:1rem;right:1.5rem;color:var(--muted);font-size:1.5rem;cursor:pointer}.interactive{background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;margin-top:1.5rem}.interactive input{background:#111;border:1px solid var(--border);color:var(--fg);padding:.5rem;border-radius:6px;width:160px;margin-right:.5rem}.feedback{margin-top:.7rem;font-weight:600}.feedback.correct{color:var(--success)}.feedback.wrong{color:var(--danger)}.hidden{display:none}.example{background:#0f1626;border:1px solid var(--border);padding:.8rem;border-radius:8px;margin-top:.5rem;font-size:.85rem;color:var(--muted)}.example b{color:var(--accent)}.warn{color:var(--warn);font-size:.8rem;font-weight:600}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">MATH TRENER</div>
+    <div class="subtitle">Basics of Trigonometry — Набор 9 из 9 (простой язык)</div>
+  </div>
+
+  <div class="score-panel">
+    <span class="score">Баллы: <span id="score">0</span>/<span id="total">40</span></span>
+    <div>
+      <span class="score-correct" id="s-correct">0</span>
+      <span class="score-wrong" id="s-wrong">0</span>
+    </div>
+  </div>
+
+  <div id="deck" class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+
+  <div class="interactive">
+    <h3 class="text-lg font-bold mb-3">Интерактивные задачи</h3>
+    <div id="taskArea"></div>
+    <input type="text" id="taskInput" placeholder="Ваш ответ">
+    <button class="btn" id="checkBtn">Проверить</button>
+    <div id="taskFeedback" class="feedback"></div>
+    <button class="btn btn-secondary mt-2" id="nextTaskBtn">Следующая задача</button>
+  </div>
+
+  <div class="nav mt-6 justify-center">
+    <button class="btn btn-secondary" id="menuBtn">На главную</button>
+    <button class="btn" id="prevBtn" disabled>← Назад</button>
+    <button class="btn" id="nextBtn">Вперед →</button>
+    <button class="btn" id="modeBtn">Перейти к задачам</button>
+  </div>
+
+  <progress class="progress" max="40" value="0"><span id="progressBar" style="width:0%"></span></progress>
+
+  <div id="menu" class="fixed inset-0 bg-black/70 opacity-0 invisible transition-all duration-300 flex items-center justify-center z-50">
+    <div class="bg-white/10 p-6 rounded-xl text-center max-w-md">
+      <h2 class="text-2xl font-bold mb-4">Режим работы</h2>
+      <button class="btn btn-secondary w-full mb-2" data-mode="cards">Карточки (изучение теории)</button>
+      <button class="btn btn-secondary w-full mb-2" data-mode="task">Задачи с вводом ответа</button>
+      <button class="btn btn-secondary w-full mt-2" data-mode="exit">На главную меню тем</button>
+    </div>
+  </div>
+
+  <div id="modal" class="modal"><div class="modal-content"><span class="close">&times;</span><p id="modalText"></p><button class="btn mt-4" id="modalOk">Хорошо</button></div></div>
+
+  <script>
+    const cards=[
+      {q:"Угол в градусах (простым языком)",a":"Полный круг = 360°. Один градус = 1/360 круга. Прямой угол = 90°."},
+      {q:"Угол в радианах",a":"Отношение длины дуги к радиусу. Чистое число. Если r = 1, длина дуги равна величине угла."},
+      {q:"Перевод градусов в радианы",a":"α(рад) = α°·π/180°. 180° = π, 90° = π/2, 45° = π/4, 30° = π/6, 60° = π/3, 270° = 3π/2, 360° = 2π."},
+      {q:"1 радиан в градусах",a":"≈ 57.3°."},
+      {q":"Обобщённые углы",a":"Могут быть больше 2π или меньше −2π (несколько витков вокруг окружности). Положительные — против часовой стрелки."},
+      {q":"Сомкнутые (сожиточные) углы",a":"Имеют одну конечную сторону. Каждый угол имеет бесконечно много таких углов (±360°·k)."},
+      {q":"Длина дуги",a":"s = r·ϑ, где ϑ в радианах."},
+      {q":"Единичная окружность",a":"x² + y² = 1 с центром в начале координат. Точка P(cos t, sin t) соответствует углу t."},
+      {q":"Синус и косинус",a":"cos t = x_P (abcissa), sin t = y_P (ordinate) точки P на единичной окружности."},
+      {q":"Пифагорово тождество",a":"cos²t + sin²t = 1."},
+      {q":"Особые углы — косинус",a":"0: 1. π/6: √3/2. π/4: √2/2. π/3: 1/2. π/2: 0."},
+      {q":"Особые углы — синус",a":"0: 0. π/6: 1/2. π/4: √2/2. π/3: √3/2. π/2: 1."},
+      {q":"Тангенс",a":"tan t = sin t / cos t. Определен при cos t ≠ 0, т.е. t ≠ π/2 + kπ, k∈Z."},
+      {q":"Котангенс",a":"cot t = cos t / sin t. Определен при sin t ≠ 0, т.е. t ≠ kπ, k∈Z."},
+      {q":"Значения tan и cot в особых углах",a":"tan 0 = 0, tan π/6 = 1/√3, tan π/4 = 1, tan π/3 = √3, tan π/2 не существует. cot обратные."},
+      {q":"График sin x",a":"Период 2π. На [0, 2π]: 0→0, π/2→1, π→0, 3π/2→−1, 2π→0."},
+      {q":"График cos x",a":"График sin x, сдвинутый влево на π/2. На [0, 2π]: 0→1, π/2→0, π→−1, 3π/2→0, 2π→1."},
+      {q":"График tan x",a":"Период π. Лучший интервал (−π/2, π/2). Вертикальные асимптоты в точках π/2 + kπ."},
+      {q":"График cot x",a":"Период π. Интервал (0, π). Вертикальные асимптоты в точках kπ."},
+      {q":"Периодическая функция",a":"f(x + T) = f(x). Минимальное такое T — период."},
+      {q":"Периоды триг. функций",a":"sin, cos: 2π. tan, cot: π."},
+      {q":"Расширение по периодичности",a":"Функцию, заданную на [a, b[, можно распространить на R: f(x + kp) = f(x), p = b − a."},
+      {q":"Общее преобразование триг. функций",a":"f(x) = A·sin(Bx + C) + D. Аналогично для cos, tan, cot."},
+      {q":"Амплитуда",a":"|A| для sin и cos."},
+      {q":"Период преобразованной функции",a":"2π/|B| для sin, cos. π/|B| для tan, cot."},
+      {q":"Фазовый сдвиг",a":"−C/B для sin, cos."},
+      {q":"Средняя линия",a":"y = D для sin, cos."},
+      {q":"Пример f(x) = 3sin(2x + 2) − 1",a":"A = 3 (амплитуда), период = π, фазовый сдвиг = −1, средняя линия y = −1."},
+      {q":"Обратная функция sin⁻¹ (arcsin)",a":"Область [−1, 1], значения [−π/2, π/2]. Присваивает x ∈ [−1, 1] единственный угол из [−π/2, π/2] с синусом x."},
+      {q":"Пример arcsin",a":"arcsin(−1/2) = −π/6."},
+      {q":"Обратная функция cos⁻¹ (arccos)",a":"Область [−1, 1], значения [0, π]. Присваивает x ∈ [−1, 1] единственный угол из [0, π] с косинусом x."},
+      {q":"Пример arccos",a":"arccos(−1/2) = 2π/3."},
+      {q":"Обратная функция tan⁻¹ (arctan)",a":"Область R, значения (−π/2, π/2). Присваивает x ∈ R единственный угол из (−π/2, π/2) с тангенсом x."},
+      {q":"Пример arctan",a":"arctan(√3/3) = π/6."},
+      {q":"arcsin(sin x)",a":"Не всегда равно x! Равно x только если x ∈ [−π/2, π/2]. Иначе нужно привести угол к этому диапазону."},
+      {q":"Сумма углов",a":"sin(α ± β) = sinα·cosβ ± cosα·sinβ. cos(α ± β) = cosα·cosβ ∓ sinα·sinβ."},
+      {q":"tan(α ± β)",a":"(tanα ± tanβ) / (1 ∓ tanα·tanβ)."},
+      {q":"Удвоение угла",a":"sin(2α) = 2sinα·cosα. cos(2α) = cos²α − sin²α = 2cos²α − 1 = 1 − 2sin²α. tan(2α) = 2tanα / (1 − tan²α)."},
+      {q":"Половина угла",a":"sin²α = (1 − cos2α)/2. cos²α = (1 + cos2α)/2. tan²α = (1 − cos2α) / (1 + cos2α)."},
+      {q":"Базовое уравнение sin x = m",a":"S = {x₁ + 2kπ} ∪ {x₂ + 2kπ}, k∈Z. x₁, x₂ — решения на [0, 2π]."},
+      {q":"Базовое уравнение cos x = n",a":"S = {±x₁ + 2kπ}, k∈Z."},
+      {q":"Базовое уравнение tan x = p",a":"S = {x₁ + kπ}, k∈Z."},
+      {q":"Квадратное уравнение с одной триг. функцией",a":"Положи sin x = t (или cos x, tan x). Реши квадратное at² + bt + c = 0. Затем реши базовые уравнения."},
+      {q":"Пример 2cos²x + cos x − 1 = 0",a":"t = cos x: 2t² + t − 1 = 0 → t₁ = −1, t₂ = 1/2. cos x = −1 → x = π + 2kπ. cos x = 1/2 → x = ±π/3 + 2kπ."},
+      {q":"Пример sin x = −√3/2",a":"x₁ = 4π/3, x₂ = 5π/3. S = {4π/3 + 2kπ} ∪ {5π/3 + 2kπ}."},
+      {q":"Домашнее 1: 8sin²x + 6sin x + 1 = 0",a":"Положи t = sin x. 8t² + 6t + 1 = 0 → t₁ = −1/4, t₂ = −1/2. Реши базовые уравнения."},
+      {q":"Домашнее 2: tan⁵x = tan x",a":"tan x(tan⁴x − 1) = 0 → tan x = 0 или tan⁴x = 1 → tan x = ±1. x = kπ или x = ±π/4 + kπ."},
+      {q":"Домашнее 6: sin(2x) − sin x = 0",a":"2sin x cos x − sin x = 0 → sin x(2cos x − 1) = 0. sin x = 0 или cos x = 1/2."},
+      {q":"Домашнее 7: 12sin²x + cos x − 6 = 0",a":"Используй sin²x = 1 − cos²x. Получи квадратное уравнение для cos x."},
+      {q":"Домашнее 8: cos(2x) − cos x = 0",a":"Используй cos(2x) = 2cos²x − 1. Получи 2cos²x − cos x − 1 = 0."},
+      {q":"Домашнее 9: sin²x − cos²x − sin x = 0",a":"Используй cos²x = 1 − sin²x. Получи 2sin²x + sin x − 1 = 0."},
+      {q":"Домашнее 10: sin²x − cos²x = 0",a":"sin²x = cos²x → tan²x = 1 → tan x = ±1 → x = ±π/4 + kπ/2."},
+    ];
+    let current=0,mode='cards',score=0,total=cards.length;
+    function renderCard(i,flip=false){
+      const c=cards[i];const deck=document.getElementById('deck');deck.innerHTML='';
+      const card=document.createElement('div');card.className=`flashcard ${flip?'flip':''}`;
+      card.innerHTML=`<div class="card-face front"><div class="q">${c.q}</div><div class="hint" onclick="flipCard(${i})">Показать ответ</div></div><div class="card-face back"><div class="a">${c.a}</div><button class="btn btn-secondary mt-2" onclick="flipCard(${i})">Скрыть ответ</button></div>`;
+      deck.appendChild(card);
+    }
+    function flipCard(i){document.querySelectorAll('.flashcard').forEach((el,idx)=>{if(idx===i)el.classList.toggle('flip');});}
+    function nextCard(){current=(current+1)%total;renderCard(current,false);updateNav();updateProgress();}
+    function prevCard(){current=(current-1+total)%total;renderCard(current,false);updateNav();updateProgress();}
+    function updateNav(){document.getElementById('prevBtn').disabled=current===0;document.getElementById('nextBtn').disabled=current===total-1;}
+    function updateProgress(){document.getElementById('progressBar').style.width=$((current+1)/total*100)+'%';document.getElementById('total').textContent=total;document.getElementById('score').textContent=score;}
+
+    const tasks=[
+      {q:"sin(π/6)=",a:"1/2"},
+      {q:"cos(π/3)=",a:"1/2"},
+      {q:"tan(π/4)=",a:"1"},
+      {q:"sin²x+cos²x=",a:"1"},
+      {q:"sin(2x)=",a:"2sinx·cosx"},
+      {q:"arcsin(1/2)=",a:"π/6"},
+    ];
+    let taskIdx=0,taskScore=0;
+    function showTask(){
+      const area=document.getElementById('taskArea');const inp=document.getElementById('taskInput');const fb=document.getElementById('taskFeedback');
+      const t=tasks[taskIdx];area.innerHTML=`<div class="text-lg font-bold mb-2">${t.q}</div>`;
+      inp.value='';fb.className='feedback';fb.textContent='';document.getElementById('nextTaskBtn').classList.add('hidden');inp.focus();
+    }
+    function checkTask(){
+      const inp=document.getElementById('taskInput').value.trim().toLowerCase();const ans=tasks[taskIdx].a.toLowerCase();
+      const fb=document.getElementById('taskFeedback');const ok=inp===ans||inp.replace(/\s/g,'')===ans.replace(/\s/g,'');
+      fb.className='feedback '+(ok?'correct':'wrong');fb.textContent=ok?'Правильно! ✔':'Неверно. Ответ: '+tasks[taskIdx].a;
+      if(ok){taskScore++;document.getElementById('s-correct').textContent=taskScore;}
+      else{document.getElementById('s-wrong').textContent=(taskIdx+1-taskScore);}
+      document.getElementById('nextTaskBtn').classList.remove('hidden');
+    }
+    function nextTask(){taskIdx=(taskIdx+1)%tasks.length;showTask();}
+
+    document.getElementById('checkBtn').onclick=checkTask;
+    document.getElementById('nextTaskBtn').onclick=nextTask;
+    document.getElementById('taskInput').addEventListener('keypress',e=>{if(e.key==='Enter')checkTask();});
+
+    function showModal(text){document.getElementById('modalText').textContent=text;document.getElementById('modal').style.display='flex';}
+    document.querySelector('.close').onclick=()=>{document.getElementById('modal').style.display='none';};
+    document.getElementById('modalOk').onclick=()=>{document.getElementById('modal').style.display='none';};
+    document.getElementById('menuBtn').onclick=()=>{document.getElementById('menu').style.display='flex';document.body.style.overflow='hidden';};
+    document.getElementById('modeBtn').onclick=()=>{
+      const deck=document.getElementById('deck');const inter=document.querySelector('.interactive');const nav=document.querySelector('.nav');const prog=document.querySelector('.progress');
+      if(mode==='cards'){deck.classList.add('hidden');inter.classList.remove('hidden');nav.classList.add('hidden');prog.classList.add('hidden');showTask();mode='task';}
+      else{deck.classList.remove('hidden');inter.classList.add('hidden');nav.classList.remove('hidden');prog.classList.remove('hidden');renderCard(0,false);updateNav();updateProgress();mode='cards';}
+    };
+    document.querySelectorAll('#menu button').forEach(btn=>{
+      btn.onclick=()=>{
+        const m=btn.dataset.mode;document.getElementById('menu').style.display='none';document.body.style.overflow='';
+        if(m==='exit'){window.location='index.html';return;}
+        const deck=document.getElementById('deck');const inter=document.querySelector('.interactive');const nav=document.querySelector('.nav');const prog=document.querySelector('.progress');
+        if(m==='task'){deck.classList.add('hidden');inter.classList.remove('hidden');nav.classList.add('hidden');prog.classList.add('hidden');showTask();mode='task';}
+        else{deck.classList.remove('hidden');inter.classList.add('hidden');nav.classList.remove('hidden');prog.classList.remove('hidden');renderCard(0,false);updateNav();updateProgress();mode='cards';}
+      };
+    });
+    renderCard(0,false);updateNav();updateProgress();
+  </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Тренажер: Formal Logic</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.0/dist/tailwind.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,optical%20size,400;0,optical%20size,600;1,optical%20size,400;1,optical%20size,600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0b0f1a;--card:#161d2e;--border:#2a3548;--fg:#e8eaed;--muted:#6b7a8c;--accent:#00d4aa;--danger:#ff6b6b;--warn:#f0a500;--success:#2a9d8f}
+  *{box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);margin:0;padding:0}.container{max-width:960px;margin:0 auto;padding:1rem}.header{text-align:center;padding:2rem 0}.logo{font-size:2rem;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:.5rem}.subtitle{color:var(--muted);font-size:.9rem}.score-panel{background:var(--card);border:1px solid var(--border);padding:1rem 1.5rem;margin:1rem 0;border-radius:8px}.score{font-size:1.2rem}.score-correct,.score-wrong{display:inline-block;min-width:1.2rem;height:1.2rem;border-radius:50%;font-size:.7rem;text-align:center;line-height:1.2;margin:0 .3rem}.score-correct{background:var(--success);color:#fff}.score-wrong{background:var(--danger);color:#fff}.flashcard{background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;position:relative;transition:transform .2s;min-height:220px}.flashcard.flip{transform:rotateY(180deg)}.card-face{position:relative;display:flex;flex-direction:column;height:100%}.q{flex:1;overflow:auto;color:var(--muted);font-size:.95rem}.a{flex:1;overflow:auto;color:var(--fg);font-size:.95rem}.hint{color:var(--accent);font-style:italic;margin-top:.5rem;font-size:.8rem;cursor:pointer}.nav{display:flex;gap:.5rem;margin-top:1rem;justify-content:center}.btn{background:var(--accent);color:#000;padding:.6rem 1.2rem;border:none;border-radius:6px;font-weight:600;cursor:pointer;transition:opacity .2s}.btn:hover{opacity:.9}.btn-secondary{background:var(--card);border:1px solid var(--border);color:var(--fg)}.progress{height:8px;background:var(--border);border-radius:4px;overflow:visible}.progress-bar{height:100%;background:var(--accent);width:0%;transition:width .3s}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:100}.modal-content{background:var(--card);padding:2rem;border-radius:12px;max-width:400px;width:90%;text-align:center}.close{position:absolute;top:1rem;right:1.5rem;color:var(--muted);font-size:1.5rem;cursor:pointer}.interactive{background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;margin-top:1.5rem}.interactive input{background:#111;border:1px solid var(--border);color:var(--fg);padding:.5rem;border-radius:6px;width:160px;margin-right:.5rem}.feedback{margin-top:.7rem;font-weight:600}.feedback.correct{color:var(--success)}.feedback.wrong{color:var(--danger)}.hidden{display:none}.example{background:#0f1626;border:1px solid var(--border);padding:.8rem;border-radius:8px;margin-top:.5rem;font-size:.85rem;color:var(--muted)}.example b{color:var(--accent)}.warn{color:var(--warn);font-size:.8rem;font-weight:600}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">MATH TRENER</div>
+    <div class="subtitle">Formal Logic — Набор 2 из 9 (простой язык)</div>
+  </div>
+
+  <div class="score-panel">
+    <span class="score">Баллы: <span id="score">0</span>/<span id="total">30</span></span>
+    <div>
+      <span class="score-correct" id="s-correct">0</span>
+      <span class="score-wrong" id="s-wrong">0</span>
+    </div>
+  </div>
+
+  <div id="deck" class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+
+  <div class="interactive">
+    <h3 class="text-lg font-bold mb-3">Интерактивные задачи</h3>
+    <div id="taskArea"></div>
+    <input type="text" id="taskInput" placeholder="Ваш ответ">
+    <button class="btn" id="checkBtn">Проверить</button>
+    <div id="taskFeedback" class="feedback"></div>
+    <button class="btn btn-secondary mt-2" id="nextTaskBtn">Следующая задача</button>
+  </div>
+
+  <div class="nav mt-6 justify-center">
+    <button class="btn btn-secondary" id="menuBtn">На главную</button>
+    <button class="btn" id="prevBtn" disabled>← Назад</button>
+    <button class="btn" id="nextBtn">Вперед →</button>
+    <button class="btn" id="modeBtn">Перейти к задачам</button>
+  </div>
+
+  <progress class="progress" max="30" value="0"><span id="progressBar" style="width:0%"></span></progress>
+
+  <div id="menu" class="fixed inset-0 bg-black/70 opacity-0 invisible transition-all duration-300 flex items-center justify-center z-50">
+    <div class="bg-white/10 p-6 rounded-xl text-center max-w-md">
+      <h2 class="text-2xl font-bold mb-4">Режим работы</h2>
+      <button class="btn btn-secondary w-full mb-2" data-mode="cards">Карточки (изучение теории)</button>
+      <button class="btn btn-secondary w-full mb-2" data-mode="task">Задачи с вводом ответа</button>
+      <button class="btn btn-secondary w-full mt-2" data-mode="exit">На главную меню тем</button>
+    </div>
+  </div>
+
+  <div id="modal" class="modal"><div class="modal-content"><span class="close">&times;</span><p id="modalText"></p><button class="btn mt-4" id="modalOk">Хорошо</button></div></div>
+
+  <script>
+    const cards=[
+      {q:"Что такое утверждение? (простым языком)",a":"Это фраза, которая либо правда, либо ложь. Третьего не дано. Например: «Снег белый» — правда. «3 < 0» — ложь. «Удине — красивый город» — не утверждение, это мнение."},
+      {q:"Логические связки",a":"¬ — отрицание (не). ∧ — и. ∨ — или. ⇒ — если… то… (импликация). ⇔ — тогда и только тогда (эквивалентность). Запятая и фигурная скобка в множествах — это ∧."},
+      {q:"Таблица истинности ¬P",a":"Если P — правда, ¬P — ложь. Если P — ложь, ¬P — правда."},
+      {q:"Таблица истинности P ∧ Q",a":"Правда только когда ОБА правды. Если хотя бы одно ложь — всё ложь."},
+      {q:"Таблица истинности P ∨ Q",a":"Ложь только когда ОБА ложь. Если хотя бы одно правда — всё правда."},
+      {q:"Таблица истинности P ⇒ Q",a":"Это самое странное. Ложь только если P правда, а Q ложь. Во всех остальных случаях — правда (даже если P ложь)."},
+      {q:"Таблица истинности P ⇔ Q",a":"Правда когда оба одинаковые (оба правда или оба ложь). Ложь когда разные."},
+      {q:"Открытое высказывание",a":"Фраза с переменной, которая становится правдой или ложью после того, как подставим конкретное число. P(x): x² − 1 = 0."},
+      {q:"Кванторы",a":"∀ — «для всех». ∃ — «существует хотя бы один». Примеры: ∀x∈R, x²+1 > 0. ∃x∈R : x − 2 = 0."},
+      {q:"Отрицание кванторов",a":"¬∀x, P(x) = ∃x, ¬P(x) (не для всех — значит существует хотя бы один, для которого не так). ¬∃x, P(x) = ∀x, ¬P(x) (не существует — значит для всех не так)."},
+      {q:"P ⇒ Q — чтение простым языком",a":"P — достаточное условие для Q. Если P правда, то Q обязательно правда. Q — необходимое условие для P. Без Q не может быть P."},
+      {q:"Контрпозитив",a":"P ⇒ Q эквивалентно ¬Q ⇒ ¬P. Они всегда имеют одинаковую таблицу истинности. Это очень важно для доказательств."},
+      {q:"Что НЕ следует из P ⇒ Q",a":"Не следует Q ⇒ P (обратное неверно). Не следует ¬P ⇒ ¬Q. Если P ложь — ничего нельзя сказать про Q."},
+      {q:"Пример импликации",a":"«Если я выпью яд, то я умру». Правда: выпил и умер. Ложь: выпил и не умер. Не выпил, но умер от другой причины — всё равно утверждение может быть правдой."},
+      {q:"Ассоциативность",a":"(P∧Q)∧R = P∧(Q∧R). (P∨Q)∨R = P∨(Q∨R). Скобки можно убрать, результат не изменится."},
+      {q:"Дистрибутивность",a":"(P∨Q)∧R = (P∧R)∨(Q∧R). (P∧Q)∨R = (P∨R)∧(Q∨R). Как с множествами ∪ и ∩."},
+      {q:"Двойное отрицание",a":"¬(¬P) = P. Два минуса дают плюс."},
+      {q:"Законы Де Моргана (логика)",a":"¬(P∧Q) = ¬P ∨ ¬Q. ¬(P∨Q) = ¬P ∧ ¬Q."},
+      {q:"Аксиома",a":"Базовое допущение, которое принимаем за правду без доказательства. Отправная точка. Примеры: постулаты Эвклида."},
+      {q:"Определение",a":"Фраза, которая точно объясняет, что значит термин. Может быть интенсивной (смысл) или экстенсивной (список примеров)."},
+      {q:"Теорема",a":"Утверждение, которое ДОКАЗАНО. Доказательство — цепочка логических шагов из аксиом и ранее доказанных теорем."},
+      {q:"Как доказывают теорему P ⇒ Q",a":"Предполагаем, что P правда, и показываем, что тогда Q обязательно правда."},
+      {q:"Пример теоремы",a":"Теорема Пифагора: в прямоугольном треугольнике квадрат от гипотенузы равен сумме квадратов от катетов."},
+      {q:"Лемма",a":"Маленькая вспомогательная теорема, нужная только чтобы доказать большую теорему."},
+      {q:"Предложение (proposition)",a":"Доказанный результат, но менее важный, чем теорема."},
+      {q:"Королларий",a":"Следствие из теоремы, которое получается почти сразу и полезно на практике."},
+      {q:"Гипотеза (конъектура)",a":"Утверждение, которое, как считают, правда, но ещё не доказано. Пример: гипотеза Голдбаха."},
+      {q:"Простое число",a":"Целое число больше 1, которое делится только на 1 и на само себя."},
+      {q:"Достаточно ли быть нечетным, чтобы быть простым?",a":"Нет. Например, 9 — нечетное, но не простое (делится на 3)."},
+    ];
+    let current=0,mode='cards',score=0,total=cards.length;
+    function renderCard(i,flip=false){
+      const c=cards[i];const deck=document.getElementById('deck');deck.innerHTML='';
+      const card=document.createElement('div');card.className=`flashcard ${flip?'flip':''}`;
+      card.innerHTML=`<div class="card-face front"><div class="q">${c.q}</div><div class="hint" onclick="flipCard(${i})">Показать ответ</div></div><div class="card-face back"><div class="a">${c.a}</div><button class="btn btn-secondary mt-2" onclick="flipCard(${i})">Скрыть ответ</button></div>`;
+      deck.appendChild(card);
+    }
+    function flipCard(i){document.querySelectorAll('.flashcard').forEach((el,idx)=>{if(idx===i)el.classList.toggle('flip');});}
+    function nextCard(){current=(current+1)%total;renderCard(current,false);updateNav();updateProgress();}
+    function prevCard(){current=(current-1+total)%total;renderCard(current,false);updateNav();updateProgress();}
+    function updateNav(){document.getElementById('prevBtn').disabled=current===0;document.getElementById('nextBtn').disabled=current===total-1;}
+    function updateProgress(){document.getElementById('progressBar').style.width=$((current+1)/total*100)+'%';document.getElementById('total').textContent=total;document.getElementById('score').textContent=score;}
+
+    const tasks=[
+      {q:"¬(P∧Q) =",a:"¬P∨¬Q"},
+      {q:"¬(P∨Q) =",a:"¬P∧¬Q"},
+      {q:"P⇒Q эквивалентно",a:"¬Q⇒¬P"},
+      {q:"∀x∈R, x²+1>0 это",a:"истинно"},
+      {q:"¬∃x,P(x) =",a:"∀x,¬P(x)"},
+      {q:"P⇔Q означает",a:"P⇒Q и Q⇒P"},
+      {q:"Если P ложно, то P⇒Q =",a:"истинно"},
+      {q:"¬∀x,P(x) =",a:"∃x,¬P(x)"},
+      {q:"¬(¬P) =",a:"P"},
+    ];
+    let taskIdx=0,taskScore=0;
+    function showTask(){
+      const area=document.getElementById('taskArea');const inp=document.getElementById('taskInput');const fb=document.getElementById('taskFeedback');
+      const t=tasks[taskIdx];area.innerHTML=`<div class="text-lg font-bold mb-2">${t.q}</div>`;
+      inp.value='';fb.className='feedback';fb.textContent='';document.getElementById('nextTaskBtn').classList.add('hidden');inp.focus();
+    }
+    function checkTask(){
+      const inp=document.getElementById('taskInput').value.trim().toLowerCase();const ans=tasks[taskIdx].a.toLowerCase();
+      const fb=document.getElementById('taskFeedback');const ok=inp===ans||inp.replace(/\s/g,'')===ans.replace(/\s/g,'');
+      fb.className='feedback '+(ok?'correct':'wrong');fb.textContent=ok?'Правильно! ✔':'Неверно. Ответ: '+tasks[taskIdx].a;
+      if(ok){taskScore++;document.getElementById('s-correct').textContent=taskScore;}
+      else{document.getElementById('s-wrong').textContent=(taskIdx+1-taskScore);}
+      document.getElementById('nextTaskBtn').classList.remove('hidden');
+    }
+    function nextTask(){taskIdx=(taskIdx+1)%tasks.length;showTask();}
+
+    document.getElementById('checkBtn').onclick=checkTask;
+    document.getElementById('nextTaskBtn').onclick=nextTask;
+    document.getElementById('taskInput').addEventListener('keypress',e=>{if(e.key==='Enter')checkTask();});
+
+    function showModal(text){document.getElementById('modalText').textContent=text;document.getElementById('modal').style.display='flex';}
+    document.querySelector('.close').onclick=()=>{document.getElementById('modal').style.display='none';};
+    document.getElementById('modalOk').onclick=()=>{document.getElementById('modal').style.display='none';};
+    document.getElementById('menuBtn').onclick=()=>{document.getElementById('menu').style.display='flex';document.body.style.overflow='hidden';};
+    document.getElementById('modeBtn').onclick=()=>{
+      const deck=document.getElementById('deck');const inter=document.querySelector('.interactive');const nav=document.querySelector('.nav');const prog=document.querySelector('.progress');
+      if(mode==='cards'){deck.classList.add('hidden');inter.classList.remove('hidden');nav.classList.add('hidden');prog.classList.add('hidden');showTask();mode='task';}
+      else{deck.classList.remove('hidden');inter.classList.add('hidden');nav.classList.remove('hidden');prog.classList.remove('hidden');renderCard(0,false);updateNav();updateProgress();mode='cards';}
+    };
+    document.querySelectorAll('#menu button').forEach(btn=>{
+      btn.onclick=()=>{
+        const m=btn.dataset.mode;document.getElementById('menu').style.display='none';document.body.style.overflow='';
+        if(m==='exit'){window.location='index.html';return;}
+        const deck=document.getElementById('deck');const inter=document.querySelector('.interactive');const nav=document.querySelector('.nav');const prog=document.querySelector('.progress');
+        if(m==='task'){deck.classList.add('hidden');inter.classList.remove('hidden');nav.classList.add('hidden');prog.classList.add('hidden');showTask();mode='task';}
+        else{deck.classList.remove('hidden');inter.classList.add('hidden');nav.classList.remove('hidden');prog.classList.remove('hidden');renderCard(0,false);updateNav();updateProgress();mode='cards';}
+      };
+    });
+    renderCard(0,false);updateNav();updateProgress();
+  </script>
+</body>
+</html>

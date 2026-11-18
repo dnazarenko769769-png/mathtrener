@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Математический тренажер — Все темы</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.0/dist/tailwind.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,optical%20size,400;0,optical%20size,600;1,optical%20size,400;1,optical%20size,600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0b0f1a;--card:#161d2e;--border:#2a3548;--fg:#e8eaed;--muted:#6b7a8c;--accent:#00d4aa;--danger:#ff6b6b;--warn:#f0a500;--success:#2a9d8f}
+  *{box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);margin:0;padding:0}.container{max-width:1000px;margin:0 auto;padding:1rem}.header{text-align:center;padding:2rem 0}.logo{font-size:2rem;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:.5rem}.subtitle{color:var(--muted);font-size:.9rem}.topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:2rem}.topic-card{background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;text-align:center;cursor:pointer;transition:transform .2s,border-color .2s}.topic-card:hover{border-color:var(--accent);transform:translateY(-4px)}.topic-card h3{color:var(--fg);margin-bottom:.5rem}.topic-card p{color:var(--muted);font-size:.85rem}.topic-card .tag{display:inline-block;margin-top:.7rem;padding:.25rem .6rem;border-radius:12px;font-size:.7rem;font-weight:600;background:var(--border);color:var(--fg)}.plan{background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;margin-top:2rem}.plan h2{color:var(--fg);margin-bottom:1rem}.plan ol{color:var(--muted);line-height:1.8;padding-left:1.2rem}.plan li{margin-bottom:.5rem}.footer{margin-top:2rem;padding:1rem;color:var(--muted);font-size:.8rem;text-align:center;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">MATH TRENER</div>
+    <div class="subtitle">Подготовка к экзамену по математике — цель 80+ баллов</div>
+  </div>
+
+  <div class="plan">
+    <h2>📅 План на 3–4 недели (что и когда изучать)</h2>
+    <ol>
+      <li><b>Неделя 1:</b> Sets &amp; Numbers → Formal Logic → Inequalities → Absolute Values (базовый язык математики)</li>
+      <li><b>Неделя 2:</b> Equations → Functions → Analytic Geometry (основная часть экзамена)</li>
+      <li><b>Неделя 3:</b> Exponential &amp; Logarithmic → Trigonometry (заключительные темы)</li>
+      <li><b>Неделя 4:</b> Повторение всех тем + решение задач Review Exercises и Homework из ваших PDF</li>
+    </ol>
+    <p style="color:var(--warn);margin-top:1rem;font-size:.9rem"><b>Как работать:</b> в каждой теме есть режим «Карточки» (учить теорию) и режим «Задачи» (тренироваться решать). Проходи карточки до тех пор, пока не будешь отвечать на все без ошибок, затем решай интерактивные задачи, затем задачи из PDF.</p>
+  </div>
+
+  <div class="topics">
+    <div class="topic-card" onclick="window.location='trener_sets.html'">
+      <h3>1. Sets &amp; Numbers</h3>
+      <p>Множества, подмножества, кардинальность, операции, N Z Q R, интервалы</p>
+      <span class="tag">35 карточек + 15 задач</span>
+    </div>
+    <div class="topic-card" onclick="window.location='trener_logic.html'">
+      <h3>2. Formal Logic</h3>
+      <p>Утверждения, связки ¬∧∨⇒⇔, кванторы ∀∃, таблицы истинности</p>
+      <span class="tag">30 карточек + 9 задач</span>
+    </div>
+    <div class="topic-card" onclick="window.location='trener_equations.html'">
+      <h3>3. Equations</h3>
+      <p>Линейные, квадратные, параметрические, дробные, иррациональные, системы</p>
+      <span class="tag">40 карточек + 7 задач</span>
+    </div>
+    <div class="topic-card" onclick="window.location='trener_geometry.html'">
+      <h3>4. Analytic Geometry</h3>
+      <p>Расстояние, середина, прямая, окружность, парабола, эллипс, гиперbola</p>
+      <span class="tag">35 карточек + 8 задач</span>
+    </div>
+    <div class="topic-card" onclick="window.location='trener_inequalities.html'">
+      <h3>5. Inequalities</h3>
+      <p>Линейные, квадратные, дробные, иррациональные, системы неравенств</p>
+      <span class="tag">35 карточек + 5 задач</span>
+    </div>
+    <div class="topic-card" onclick="window.location='trener_functions.html'">
+      <h3>6. Functions</h3>
+      <p>Область определения, область значений, график, инъекция, сюръекция, композиция</p>
+      <span class="tag">30 карточек + 8 задач</span>
+    </div>
+    <div class="topic-card" onclick="window.location='trener_absval.html'">
+      <h3>7. Absolute Values</h3>
+      <p>Определение модуля, свойства, неравенства с модулем, графики с модулем</p>
+      <span class="tag">25 карточек + 5 задач</span>
+    </div>
+    <div class="topic-card" onclick="window.location='trener_explog.html'">
+      <h3>8. Exp &amp; Log</h3>
+      <p>Экспонента, логарифм, свойства, уравнения и неравенства, замена переменной</p>
+      <span class="tag">35 карточек + 6 задач</span>
+    </div>
+    <div class="topic-card" onclick="window.location='trener_trigo.html'">
+      <h3>9. Trigonometry</h3>
+      <p>Радианы, единичная окружность, sin/cos/tan, тождества, уравнения, обратные функции</p>
+      <span class="tag">40 карточек + 6 задач</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    Открой любой файл в браузере (двойной клик). Интернет не нужен для работы после загрузки.<br>
+    Карточки + тестовый режим + интерактивные задачи с вводом ответа + прогресс-бар.
+  </div>
+</div>
+</body>
+</html>

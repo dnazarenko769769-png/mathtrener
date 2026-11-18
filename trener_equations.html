@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Тренажер: Equations</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.0/dist/tailwind.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,optical%20size,400;0,optical%20size,600;1,optical%20size,400;1,optical%20size,600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0b0f1a;--card:#161d2e;--border:#2a3548;--fg:#e8eaed;--muted:#6b7a8c;--accent:#00d4aa;--danger:#ff6b6b;--warn:#f0a500;--success:#2a9d8f}
+  *{box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);margin:0;padding:0}.container{max-width:960px;margin:0 auto;padding:1rem}.header{text-align:center;padding:2rem 0}.logo{font-size:2rem;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:.5rem}.subtitle{color:var(--muted);font-size:.9rem}.score-panel{background:var(--card);border:1px solid var(--border);padding:1rem 1.5rem;margin:1rem 0;border-radius:8px}.score{font-size:1.2rem}.score-correct,.score-wrong{display:inline-block;min-width:1.2rem;height:1.2rem;border-radius:50%;font-size:.7rem;text-align:center;line-height:1.2;margin:0 .3rem}.score-correct{background:var(--success);color:#fff}.score-wrong{background:var(--danger);color:#fff}.flashcard{background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;position:relative;transition:transform .2s;min-height:220px}.flashcard.flip{transform:rotateY(180deg)}.card-face{position:relative;display:flex;flex-direction:column;height:100%}.q{flex:1;overflow:auto;color:var(--muted);font-size:.95rem}.a{flex:1;overflow:auto;color:var(--fg);font-size:.95rem}.hint{color:var(--accent);font-style:italic;margin-top:.5rem;font-size:.8rem;cursor:pointer}.nav{display:flex;gap:.5rem;margin-top:1rem;justify-content:center}.btn{background:var(--accent);color:#000;padding:.6rem 1.2rem;border:none;border-radius:6px;font-weight:600;cursor:pointer;transition:opacity .2s}.btn:hover{opacity:.9}.btn-secondary{background:var(--card);border:1px solid var(--border);color:var(--fg)}.progress{height:8px;background:var(--border);border-radius:4px;overflow:visible}.progress-bar{height:100%;background:var(--accent);width:0%;transition:width .3s}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:100}.modal-content{background:var(--card);padding:2rem;border-radius:12px;max-width:400px;width:90%;text-align:center}.close{position:absolute;top:1rem;right:1.5rem;color:var(--muted);font-size:1.5rem;cursor:pointer}.interactive{background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;margin-top:1.5rem}.interactive input{background:#111;border:1px solid var(--border);color:var(--fg);padding:.5rem;border-radius:6px;width:160px;margin-right:.5rem}.feedback{margin-top:.7rem;font-weight:600}.feedback.correct{color:var(--success)}.feedback.wrong{color:var(--danger)}.hidden{display:none}.example{background:#0f1626;border:1px solid var(--border);padding:.8rem;border-radius:8px;margin-top:.5rem;font-size:.85rem;color:var(--muted)}.example b{color:var(--accent)}.warn{color:var(--warn);font-size:.8rem;font-weight:600}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">MATH TRENER</div>
+    <div class="subtitle">Equations — Набор 3 из 9 (простой язык)</div>
+  </div>
+
+  <div class="score-panel">
+    <span class="score">Баллы: <span id="score">0</span>/<span id="total">40</span></span>
+    <div>
+      <span class="score-correct" id="s-correct">0</span>
+      <span class="score-wrong" id="s-wrong">0</span>
+    </div>
+  </div>
+
+  <div id="deck" class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+
+  <div class="interactive">
+    <h3 class="text-lg font-bold mb-3">Интерактивные задачи</h3>
+    <div id="taskArea"></div>
+    <input type="text" id="taskInput" placeholder="Ваш ответ">
+    <button class="btn" id="checkBtn">Проверить</button>
+    <div id="taskFeedback" class="feedback"></div>
+    <button class="btn btn-secondary mt-2" id="nextTaskBtn">Следующая задача</button>
+  </div>
+
+  <div class="nav mt-6 justify-center">
+    <button class="btn btn-secondary" id="menuBtn">На главную</button>
+    <button class="btn" id="prevBtn" disabled>← Назад</button>
+    <button class="btn" id="nextBtn">Вперед →</button>
+    <button class="btn" id="modeBtn">Перейти к задачам</button>
+  </div>
+
+  <progress class="progress" max="40" value="0"><span id="progressBar" style="width:0%"></span></progress>
+
+  <div id="menu" class="fixed inset-0 bg-black/70 opacity-0 invisible transition-all duration-300 flex items-center justify-center z-50">
+    <div class="bg-white/10 p-6 rounded-xl text-center max-w-md">
+      <h2 class="text-2xl font-bold mb-4">Режим работы</h2>
+      <button class="btn btn-secondary w-full mb-2" data-mode="cards">Карточки (изучение теории)</button>
+      <button class="btn btn-secondary w-full mb-2" data-mode="task">Задачи с вводом ответа</button>
+      <button class="btn btn-secondary w-full mt-2" data-mode="exit">На главную меню тем</button>
+    </div>
+  </div>
+
+  <div id="modal" class="modal"><div class="modal-content"><span class="close">&times;</span><p id="modalText"></p><button class="btn mt-4" id="modalOk">Хорошо</button></div></div>
+
+  <script>
+    const cards=[
+      {q:"Что такое уравнение? (простым языком)",a":"Это вопрос: при каких значениях x левое becomes равно правому? Например: 6x − 3 = −2x + 5. Нужно найти все x, для которых это правда."},
+      {q:"Множество решений S",a":"Все значения x, которые делают уравнение истинным. Пишут S = {x : ...}."},
+      {q:"Линейное уравнение ax + b = 0",a":"Если a ≠ 0: x = −b/a. Если a = 0: когда b = 0 — любое x подходит (S = R); когда b ≠ 0 — нет решений (S = ∅)."},
+      {q:"Квадратное уравнение ax² + bx + c = 0",a":"Корни: x = (−b ± √Δ) / 2a, где Δ = b² − 4ac. Если Δ = 0 — один корень (кратности 2). Если Δ < 0 — нет вещественных корней."},
+      {q:"Дискриминант Δ",a":"Показывает, сколько корней. Δ > 0 — два разных. Δ = 0 — один. Δ < 0 — нет."},
+      {q:"Параметрические уравнения",a":"Коэффициенты зависят от параметра (например, k). Сначала разбери возможные значения k, затем решай как обычное уравнение."},
+      {q:"Пример параметрического",a":"(k − 3)x − (3k + 1) = 0. Если k = 3: −10 = 0 — нет решений. Если k ≠ 3: x = (3k + 1)/(k − 3)."},
+      {q:"Дробное уравнение P(x)/Q(x) = 0",a":"Сначала область определения: Q(x) ≠ 0. Затем решаешь P(x) = 0, но отбрасываешь решения, где Q = 0."},
+      {q:"Уравнение степени выше 2",a":"Приведи к виду что-то = 0, разложи на множители. Если произведение равно 0 — хотя бы один множитель равен 0."},
+      {q:"Пример высшей степени",a":"x³ + 2x² + 2x + 1 = 0 ⇒ (x + 1)(x² − x + 1) + 2x(x + 1) = 0 ⇒ (x + 1)(x² + x + 1) = 0 ⇒ x = −1."},
+      {q:"Смена переменной",a":"Если видишь x⁴, x² — положи t = x². Если x⁶, x³ — положи t = x³. Получишь квадратное."},
+      {q:"Система уравнений",a":"Несколько уравнений одновременно. Нужно найти x и y, которые подходят ко ВСЕМ уравнениям сразу."},
+      {q:"Линейная система — сколько решений",a":"Только 0, 1 или бесконечно много. Ничего другого."},
+      {q:"Как решать систему 2×2",a":"1) Из одного уравнения вырази x через y (или наоборот). 2) Подставь во второе уравнение. 3) Реши полученное уравнение с одной переменной. 4) Подставь обратно, найди вторую переменную."},
+      {q:"Пример системы с одним решением",a":"2x − y + 1 = 0; x + 3y = 0. Из второго x = −3y. Подставляем: −6y − y + 1 = 0 → y = 1/7, x = −3/7."},
+      {q:"Система без решений",a":"y − 2x = 0; 4x − 2y + 1 = 0. Из первого y = 2x. Подставляем: 4x − 4x + 1 = 0 → 1 = 0, противоречие. S = ∅."},
+      {q:"Система с бесконечно многими решениями",a":"x − 2y = 2; 4x − 8y = 8. Из первого x = 2y + 2. Подставляем: 8y + 8 − 8y = 8 → всё верно для любого y. S = {(2y+2, y)}."},
+      {q:"Иррациональное уравнение",a":"Переменная под корнем. 1) Область определения (под корнем ≥ 0). 2) Возведи в степень (внимательно!). 3) ОБЯЗАТЕЛЬНО проверь подстановкой — лишние решения могут появиться."},
+      {q:"Проверка иррационального",a":"√x² = −1 не имеет решений. Но если возвести в квадрат: x² = 1 → x = ±1. Эти решения не подходят к исходному — отбрасываем."},
+      {q:"Сумма и произведение корней квадратного",a":"x₁ + x₂ = −b/a. x₁ · x₂ = c/a. Это часто помогает без решения уравнения."},
+      {q:"Если один корень x² − 12x + k = 0 равен 3",a":"Другой корень = 9 (так как сумма корней = 12)."},
+      {q:"Домашнее: x² − 7|x| − 18 = 0",a":"Положи t = |x|. Получим t² − 7t − 18 = 0 → t = 9 или t = −2. Но t = |x| ≥ 0, значит t = 9. x = 9 или x = −9."},
+      {q:"Домашнее: (3x+1)² + x = 2x − 1",a":"x₁ = −1, x₂ = −1/6."},
+    ];
+    let current=0,mode='cards',score=0,total=cards.length;
+    function renderCard(i,flip=false){
+      const c=cards[i];const deck=document.getElementById('deck');deck.innerHTML='';
+      const card=document.createElement('div');card.className=`flashcard ${flip?'flip':''}`;
+      card.innerHTML=`<div class="card-face front"><div class="q">${c.q}</div><div class="hint" onclick="flipCard(${i})">Показать ответ</div></div><div class="card-face back"><div class="a">${c.a}</div><button class="btn btn-secondary mt-2" onclick="flipCard(${i})">Скрыть ответ</button></div>`;
+      deck.appendChild(card);
+    }
+    function flipCard(i){document.querySelectorAll('.flashcard').forEach((el,idx)=>{if(idx===i)el.classList.toggle('flip');});}
+    function nextCard(){current=(current+1)%total;renderCard(current,false);updateNav();updateProgress();}
+    function prevCard(){current=(current-1+total)%total;renderCard(current,false);updateNav();updateProgress();}
+    function updateNav(){document.getElementById('prevBtn').disabled=current===0;document.getElementById('nextBtn').disabled=current===total-1;}
+    function updateProgress(){document.getElementById('progressBar').style.width=$((current+1)/total*100)+'%';document.getElementById('total').textContent=total;document.getElementById('score').textContent=score;}
+
+    const tasks=[
+      {q:"Реши 7x−5=13−2x:",a:"x=2"},
+      {q:"Реши mx=m(m−1) (m≠0):",a:"x=m−1"},
+      {q:"Корни x²+x−6=0:",a:"x=2, x=-3"},
+      {q:"Δ для x²−4x+4=0:",a:"0"},
+      {q:"a(x−a)+b(x−2a)−b²=0 при a=b:",a:"x=a+b"},
+      {q:"x²−7|x|−18=0:",a:"x=9, x=-9"},
+      {q:"x²−2(k+1)x+1=0:",a:"x=k+1±√(k²+2k)"},
+    ];
+    let taskIdx=0,taskScore=0;
+    function showTask(){
+      const area=document.getElementById('taskArea');const inp=document.getElementById('taskInput');const fb=document.getElementById('taskFeedback');
+      const t=tasks[taskIdx];area.innerHTML=`<div class="text-lg font-bold mb-2">${t.q}</div>`;
+      inp.value='';fb.className='feedback';fb.textContent='';document.getElementById('nextTaskBtn').classList.add('hidden');inp.focus();
+    }
+    function checkTask(){
+      const inp=document.getElementById('taskInput').value.trim().toLowerCase();const ans=tasks[taskIdx].a.toLowerCase();
+      const fb=document.getElementById('taskFeedback');const ok=inp===ans||inp.replace(/\s/g,'')===ans.replace(/\s/g,'');
+      fb.className='feedback '+(ok?'correct':'wrong');fb.textContent=ok?'Правильно! ✔':'Неверно. Ответ: '+tasks[taskIdx].a;
+      if(ok){taskScore++;document.getElementById('s-correct').textContent=taskScore;}
+      else{document.getElementById('s-wrong').textContent=(taskIdx+1-taskScore);}
+      document.getElementById('nextTaskBtn').classList.remove('hidden');
+    }
+    function nextTask(){taskIdx=(taskIdx+1)%tasks.length;showTask();}
+
+    document.getElementById('checkBtn').onclick=checkTask;
+    document.getElementById('nextTaskBtn').onclick=nextTask;
+    document.getElementById('taskInput').addEventListener('keypress',e=>{if(e.key==='Enter')checkTask();});
+
+    function showModal(text){document.getElementById('modalText').textContent=text;document.getElementById('modal').style.display='flex';}
+    document.querySelector('.close').onclick=()=>{document.getElementById('modal').style.display='none';};
+    document.getElementById('modalOk').onclick=()=>{document.getElementById('modal').style.display='none';};
+    document.getElementById('menuBtn').onclick=()=>{document.getElementById('menu').style.display='flex';document.body.style.overflow='hidden';};
+    document.getElementById('modeBtn').onclick=()=>{
+      const deck=document.getElementById('deck');const inter=document.querySelector('.interactive');const nav=document.querySelector('.nav');const prog=document.querySelector('.progress');
+      if(mode==='cards'){deck.classList.add('hidden');inter.classList.remove('hidden');nav.classList.add('hidden');prog.classList.add('hidden');showTask();mode='task';}
+      else{deck.classList.remove('hidden');inter.classList.add('hidden');nav.classList.remove('hidden');prog.classList.remove('hidden');renderCard(0,false);updateNav();updateProgress();mode='cards';}
+    };
+    document.querySelectorAll('#menu button').forEach(btn=>{
+      btn.onclick=()=>{
+        const m=btn.dataset.mode;document.getElementById('menu').style.display='none';document.body.style.overflow='';
+        if(m==='exit'){window.location='index.html';return;}
+        const deck=document.getElementById('deck');const inter=document.querySelector('.interactive');const nav=document.querySelector('.nav');const prog=document.querySelector('.progress');
+        if(m==='task'){deck.classList.add('hidden');inter.classList.remove('hidden');nav.classList.add('hidden');prog.classList.add('hidden');showTask();mode='task';}
+        else{deck.classList.remove('hidden');inter.classList.add('hidden');nav.classList.remove('hidden');prog.classList.remove('hidden');renderCard(0,false);updateNav();updateProgress();mode='cards';}
+      };
+    });
+    renderCard(0,false);updateNav();updateProgress();
+  </script>
+</body>
+</html>
